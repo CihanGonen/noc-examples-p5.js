@@ -17,6 +17,8 @@ class Population {
     this.target = p; // Target phrase
     this.mutationRate = m; // Mutation rate
     this.perfectScore = 1;
+    this.start = new Date();
+    this.end = new Date();
 
     this.best = "";
 
@@ -35,15 +37,29 @@ class Population {
     }
   }
 
+  doElitism(){
+    let sortedPop = [...this.population].sort(function(a, b) {
+      return b.fitness - a.fitness;
+    });
+    let numberOfElites = floor(this.popmax*this.elitismRate)
+    this.elites = sortedPop.slice(0,numberOfElites)  
+  }
+
+  normalize = (val, newMin, newMax, minVal, maxVal,) => {
+      return newMin + (val - minVal) * (newMax - newMin) / (maxVal - minVal);
+  };
+
   // Generate a mating pool
   naturalSelection() {
     // Clear the ArrayList
     this.matingPool = [];
 
     let maxFitness = 0;
+    let maxIndex = 0;
     for (let i = 0; i < this.population.length; i++) {
       if (this.population[i].fitness > maxFitness) {
         maxFitness = this.population[i].fitness;
+        maxIndex = i;
       }
     }
 
@@ -51,9 +67,8 @@ class Population {
     // a higher fitness = more entries to mating pool = more likely to be picked as a parent
     // a lower fitness = fewer entries to mating pool = less likely to be picked as a parent
     for (let i = 0; i < this.population.length; i++) {
-
-      let fitness = map(this.population[i].fitness, 0, maxFitness, 0, 1);
-      let n = floor(fitness * 100); // Arbitrary multiplier, we can also use monte carlo method
+      let fitness = this.normalize(this.population[i].fitness, 0, maxFitness, 0, 1)
+      let n = floor(fitness*100); // Arbitrary multiplier, we can also use monte carlo method
       for (let j = 0; j < n; j++) { // and pick two random numbers
         this.matingPool.push(this.population[i]);
       }
@@ -62,15 +77,20 @@ class Population {
 
   // Create a new generation
   generate() {
+    let numberOfElites = floor(this.popmax*this.elitismRate)
     // Refill the population with children from the mating pool
     for (let i = 0; i < this.population.length; i++) {
-      let a = floor(random(this.matingPool.length));
-      let b = floor(random(this.matingPool.length));
-      let partnerA = this.matingPool[a];
-      let partnerB = this.matingPool[b];
-      let child = partnerA.crossover(partnerB);
-      child.mutate(this.mutationRate);
-      this.population[i] = child;
+      if(i<numberOfElites){
+        this.population[i]=this.elites[i]
+      }else{
+        let a = floor(random(this.matingPool.length));
+        let b = floor(random(this.matingPool.length));
+        let partnerA = this.matingPool[a];
+        let partnerB = this.matingPool[b];
+        let child = partnerA.crossover(partnerB);
+        child.mutate(this.mutationRate);
+        this.population[i] = child;
+      }
     }
     this.generations++;
   }
@@ -89,10 +109,12 @@ class Population {
         index = i;
         worldrecord = this.population[i].fitness;
       }
-    }
+    } 
 
     this.best = this.population[index].getPhrase();
+    
     if (worldrecord === this.perfectScore) {
+      this.end = new Date()
       this.finished = true;
     }
   }

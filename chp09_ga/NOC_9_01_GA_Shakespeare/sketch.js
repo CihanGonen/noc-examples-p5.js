@@ -54,41 +54,58 @@ function setup() {
   //createCanvas(640, 360);
   target = "To be or not to be.";
   popmax = 200;
-  mutationRate = 0.01;
+  mutationRate = .01;
+  elitismRate = .01;
+  elites = [];
 
   // Create a population with a target phrase, mutation rate, and population max
   population = new Population(target, mutationRate, popmax);
 }
 
 function draw() {
-  // Generate mating pool
-  population.naturalSelection();
-  //Create next generation
-  population.generate();
-  // Calculate fitness
-  population.calcFitness();
+    // Pick elites
+    population.doElitism();
 
-  population.evaluate();
+    // Generate mating pool
+    population.naturalSelection();
+    
+    //Create next generation
+    population.generate();
 
-  // If we found the target phrase, stop
-  if (population.isFinished()) {
+    // Calculate fitness
+    population.calcFitness();
+
+    population.evaluate();
+
+    // If we found the target phrase, stop
+    if (population.isFinished()) {
     //println(millis()/1000.0);
     noLoop();
-  }
+    }
 
-  displayInfo();
+    displayInfo();
 }
+
+function formatDate(difference) {
+    let seconds = Math.floor((difference % (1000 * 60)) / 1000);
+    let ms =  Math.floor(difference % 1000);
+    return  seconds + " sec, "+ ms+ ' ms';
+ }
 
 function displayInfo() {
   // Display current status of population
   let answer = population.getBest();
 
-  bestPhrase.html("Best phrase:<br>" + answer);
+  bestPhrase.html("<h2>Best phrase:<br>" + answer +"</h2>");
 
-  let statstext = "total generations:     " + population.getGenerations() + "<br>";
-  statstext += "average fitness:       " + nf(population.getAverageFitness()) + "<br>";
-  statstext += "total population:      " + popmax + "<br>";
-  statstext += "mutation rate:         " + floor(mutationRate * 100) + "%";
+  let statstext = "<h2>total generations:     " + population.getGenerations() + "</h2><br>";
+  statstext += "<h2>average fitness:       " + nf(population.getAverageFitness()) + "</h2><br>";
+  statstext += "<h2>total population:      " + popmax + "</h2><br>";
+  statstext += "<h2>mutation rate:         " + floor(mutationRate * 100) + "%" + "</h2><br>";
+  statstext += "<h2>elitism rate:         " + floor(elitismRate * 100) + "%" + "</h2><br>";
+  if(population.isFinished()){
+    statstext += "<h2>time taken:          " + formatDate(population.end - population.start) +'</h2>' 
+  }
 
   stats.html(statstext);
 
