@@ -55,7 +55,7 @@ function setup() {
   target = "To be or not to be.";
   popmax = 200;
   mutationRate = .01;
-  elitismRate = .005;
+  elitismRate = .01;
   elites = [];
 
   // Create a population with a target phrase, mutation rate, and population max

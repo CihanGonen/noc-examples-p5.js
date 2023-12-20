@@ -80,11 +80,9 @@ class Population {
   // Create a new generation
   generate() {
     let numberOfElites = floor(this.popmax*this.elitismRate)
-    console.log(numberOfElites)
     // Refill the population with children from the mating pool
     for (let i = 0; i < this.population.length; i++) {
       if(i<numberOfElites){
-        console.log(this.elites[i])
         this.population[i]=this.elites[i]
       }else{
         let a = floor(random(this.matingPool.length));
