@@ -8,7 +8,7 @@
 // In this case, each organism is just an instance of a DNA object
 
 class Population {
-  constructor(p, m, num) {
+  constructor(p, m, e, popmax) {
 
     this.population; // Array to hold the current population
     this.matingPool; // ArrayList which we will use for our "mating pool"
@@ -16,14 +16,16 @@ class Population {
     this.finished = false; // Are we finished evolving?
     this.target = p; // Target phrase
     this.mutationRate = m; // Mutation rate
+    this.elitismRate = e;
     this.perfectScore = 1;
     this.start = new Date();
     this.end = new Date();
+    this.popmax = popmax;
 
     this.best = "";
 
     this.population = [];
-    for (let i = 0; i < num; i++) {
+    for (let i = 0; i < popmax; i++) {
       this.population[i] = new DNA(this.target.length);
     }
     this.matingPool = [];
@@ -78,9 +80,11 @@ class Population {
   // Create a new generation
   generate() {
     let numberOfElites = floor(this.popmax*this.elitismRate)
+    console.log(numberOfElites)
     // Refill the population with children from the mating pool
     for (let i = 0; i < this.population.length; i++) {
       if(i<numberOfElites){
+        console.log(this.elites[i])
         this.population[i]=this.elites[i]
       }else{
         let a = floor(random(this.matingPool.length));

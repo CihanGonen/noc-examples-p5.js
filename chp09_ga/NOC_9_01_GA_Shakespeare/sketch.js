@@ -55,11 +55,11 @@ function setup() {
   target = "To be or not to be.";
   popmax = 200;
   mutationRate = .01;
-  elitismRate = .01;
+  elitismRate = .005;
   elites = [];
 
   // Create a population with a target phrase, mutation rate, and population max
-  population = new Population(target, mutationRate, popmax);
+  population = new Population(target, mutationRate,elitismRate, popmax);
 }
 
 function draw() {
